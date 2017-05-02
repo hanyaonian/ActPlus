@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.RunnableFuture;
 
 import static android.content.ContentValues.TAG;
 
@@ -19,7 +20,7 @@ import static android.content.ContentValues.TAG;
  */
 
 public class NetTools {
-    public void getListJson(int startPage, int pageSize, String pageType) {
+    public String getListJson(int startPage, int pageSize, String pageType) {
         HttpURLConnection connection = null;
         String url = "http://actplus.sysuactivity.com/api/actlist";
         try {
@@ -29,19 +30,28 @@ public class NetTools {
             connection.setReadTimeout(8000);
             connection.setConnectTimeout(8000);
             InputStream in = connection.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            StringBuilder stringBuilder = new StringBuilder();
-            String line;
-            String response;
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line);
+            //get json string
+            int responseCode = connection.getResponseCode();
+            if (responseCode == 200) {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                String response = "";
+                while ((line = bufferedReader.readLine()) != null) {
+                    response += line;
+                }
+                return response;
+            }
+            else {
+                return null;
             }
         } catch(Exception e) {
             Log.i(TAG, "getListJson: " + e.toString());
         }
+        return null;
     }
-    public List<ActItem> getList() {
+    public List<ActItem> getList(final int startPage,final int pageSize,final String pageType) {
         List<ActItem> data = new ArrayList<>();
+        String shit = getListJson(startPage, pageSize, pageType);
         return data;
     }
     public Bitmap getImage(String imageType, String imageName) {

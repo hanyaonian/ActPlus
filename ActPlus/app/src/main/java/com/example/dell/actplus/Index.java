@@ -3,6 +3,7 @@ package com.example.dell.actplus;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -40,7 +41,23 @@ public class Index extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        /*
+        * net test
+        */
+        tool = new NetTools();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    tool.getList(0, 5, "allList");
+                } catch(Exception e) {
+                    Log.i("oncreate", e.toString());
+                }
+            }
+        }).start();
     }
+    private NetTools tool;
 
     @Override
     public void onBackPressed() {

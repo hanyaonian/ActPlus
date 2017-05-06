@@ -1,6 +1,7 @@
 package com.example.dell.actplus;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -45,10 +46,13 @@ public class NetTools {
                 return response;
             }
             else {
+                connection.disconnect();
                 return null;
             }
         } catch(Exception e) {
             Log.i(TAG, "getListJson: " + e.toString());
+        } finally {
+            if (connection != null) connection.disconnect();
         }
         return null;
     }
@@ -72,6 +76,27 @@ public class NetTools {
     }
     public Bitmap getImage(String imageType, String imageName) {
         Bitmap bitmap;
+        //获取方式 ： GET
+        //图片地址 ：http://actplus.sysuactivity.com/imgBase/{imageType}/{imageName}
+        String url = "http://actplus.sysuactivity.com/imgBase/{" + imageType + "}/{"+ imageName + "}";
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) (new URL(url.toString()).openConnection());
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(3000);
+            connection.setReadTimeout(3000);
+            if (connection.getResponseCode() == 200) {
+                //inputstream to bitmap
+                InputStream in = connection.getInputStream();
+                bitmap = BitmapFactory.decodeStream(in);
+                return bitmap;
+            }
+        } catch (Exception e) {
+            Log.i("getBitmap part", "error");
+        } finally {
+            if (connection != null)
+            connection.disconnect();
+        }
         return null;
     }
 }

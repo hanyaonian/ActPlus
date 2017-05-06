@@ -3,6 +3,9 @@ package com.example.dell.actplus;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,6 +55,19 @@ public class NetTools {
     public List<ActItem> getList(final int startPage,final int pageSize,final String pageType) {
         List<ActItem> data = new ArrayList<>();
         String shit = getListJson(startPage, pageSize, pageType);
+        try {
+            JSONArray jsonArray = new JSONArray(shit);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject temp = jsonArray.getJSONObject(i);
+                //get detail
+                ActItem item = new ActItem(temp.getString("actName"), temp.getString("actTime"), temp.getString("actId"),temp.getString("actLoc"));
+                //get poster image
+                item.SetImage(getImage("poster", temp.getString("posterName")));
+                data.add(item);
+            }
+        } catch (Exception e) {
+            Log.i("jsonArray part", "error");
+        }
         return data;
     }
     public Bitmap getImage(String imageType, String imageName) {

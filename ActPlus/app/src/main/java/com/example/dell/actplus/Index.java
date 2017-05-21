@@ -1,6 +1,9 @@
 package com.example.dell.actplus;
 
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -13,6 +16,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Index extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -41,24 +49,57 @@ public class Index extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        /*
-        * net test
-        */
+        //初始化类
         tool = new NetTools();
+        //获取初始数据
+        try {
+            UpdateDataAndUI(0, 5, "allList");
+        } catch (Exception e) {
+            Log.e("On Create", e.toString());
+        }
+    }
+    private NetTools tool;
+
+    public void UpdateDataAndUI(final int startPage, final int pageSize, final String dataType) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    tool.getList(0, 5, "allList");
+                    List<ActItem> listdata = tool.getList(startPage, pageSize, dataType);
+                    Message message = new Message();
+                    message.what = UPDATE_CONTENT;
+                    message.obj = listdata;
+                    handler.sendMessage(message);
                 } catch(Exception e) {
-                    Log.i("oncreate", e.toString());
+                    Log.i("onCreate", e.toString());
                 }
             }
         }).start();
     }
-    private NetTools tool;
-
+    private final int UPDATE_CONTENT = 0;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case UPDATE_CONTENT:
+                    List<ActItem> data = (List<ActItem>) msg.obj;
+                    updateUI(data);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+    private void updateUI(final List<ActItem> data) {
+        try {
+            PullToRefreshListView listView = (PullToRefreshListView) findViewById(R.id.PTF_listview);
+            Myadpter myadpter = new Myadpter(getApplicationContext(), data);
+            listView.setAdapter(myadpter);
+        } catch (Exception e) {
+            Log.e("updateUI", e.toString());
+        }
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

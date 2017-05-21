@@ -8,8 +8,9 @@ import android.graphics.Bitmap;
 
 public class ActItem {
     private Bitmap image;
-    private String ActName, ActTime, ActId, ActPlace;
-    public ActItem(String actName, String actTime, String actId, String actPlace) {
+    private String ActName, ActTime, ActPlace;
+    private int ActId;
+    public ActItem(String actName, String actTime, int actId, String actPlace) {
         ActName = actName;
         ActId = actId;
         ActTime = actTime;
@@ -24,4 +25,10 @@ public class ActItem {
         return image;
     }
 
+    public int getId() {
+        return ActId;
+    }
+    public String getTime() { return ActTime;}
+    public String getTitle(){ return ActName;}
+    public String getActPlace() {return ActPlace;}
 }

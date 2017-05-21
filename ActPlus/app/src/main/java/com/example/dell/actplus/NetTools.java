@@ -26,7 +26,7 @@ import static android.content.ContentValues.TAG;
 public class NetTools {
     public String getListJson(int startPage, int pageSize, String pageType) {
         HttpURLConnection connection = null;
-        String url = "http://actplus.sysuactivity.com/api/actlist";
+        String url = "http://actplus.sysuactivity.com/api/actlist"+"?startPage="+startPage+"&pageSize="+pageSize+"&pageType="+pageType;
         try {
             Log.i("getListJson", "start connecting");
             connection = (HttpURLConnection) ((new URL(url.toString())).openConnection());
@@ -64,7 +64,7 @@ public class NetTools {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject temp = jsonArray.getJSONObject(i);
                 //get detail
-                ActItem item = new ActItem(temp.getString("actName"), temp.getString("actTime"), temp.getString("actId"),temp.getString("actLoc"));
+                ActItem item = new ActItem(temp.getString("actName"), temp.getString("actTime"), temp.getInt("actId"),temp.getString("actLoc"));
                 //get poster image
                 item.SetImage(getImage("poster", temp.getString("posterName")));
                 data.add(item);
@@ -75,10 +75,9 @@ public class NetTools {
         return data;
     }
     public Bitmap getImage(String imageType, String imageName) {
-        Bitmap bitmap;
         //获取方式 ： GET
         //图片地址 ：http://actplus.sysuactivity.com/imgBase/{imageType}/{imageName}
-        String url = "http://actplus.sysuactivity.com/imgBase/{" + imageType + "}/{"+ imageName + "}";
+        String url = "http://actplus.sysuactivity.com/imgBase/" + imageType + "/"+ imageName;
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) (new URL(url.toString()).openConnection());
@@ -88,8 +87,10 @@ public class NetTools {
             if (connection.getResponseCode() == 200) {
                 //inputstream to bitmap
                 InputStream in = connection.getInputStream();
-                bitmap = BitmapFactory.decodeStream(in);
+                Bitmap bitmap = BitmapFactory.decodeStream(in);
                 return bitmap;
+            } else {
+                return null;
             }
         } catch (Exception e) {
             Log.i("getBitmap part", "error");

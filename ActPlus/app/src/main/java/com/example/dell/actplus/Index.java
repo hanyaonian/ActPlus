@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.ListViewAutoScrollHelper;
 import android.util.Log;
 import android.view.View;
@@ -65,6 +66,8 @@ public class Index extends AppCompatActivity
         tool = new NetTools();
         //获取初始数据
         try {
+            dialog = ProgressDialog
+                    .show(Index.this, "亲别急", "活动正在加载中", false);
             UpdateDataAndUI(0, 5, "allList");
             setUpViewPager();
         } catch (Exception e) {
@@ -74,9 +77,10 @@ public class Index extends AppCompatActivity
     private NetTools tool;
     private List<ActItem> listData;
 
-    //设置正在加载
+    //设置正在加载,progress
+    private ProgressDialog dialog;
     public void setUpViewPager(){
-
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
     }
     public void UpdateDataAndUI(final int startPage, final int pageSize, final String dataType) {
         new Thread(new Runnable() {
@@ -114,6 +118,7 @@ public class Index extends AppCompatActivity
             PullToRefreshListView listView = (PullToRefreshListView) findViewById(R.id.PTF_listview);
             Myadpter myadpter = new Myadpter(getApplicationContext(), data);
             listView.setAdapter(myadpter);
+            dialog.dismiss();
         } catch (Exception e) {
             Log.e("updateUI", e.toString());
         }

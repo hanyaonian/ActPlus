@@ -2,6 +2,7 @@ package com.example.dell.actplus;
 
 import android.app.ProgressDialog;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
@@ -65,16 +67,26 @@ public class Index extends AppCompatActivity
         PullToRefreshListView PTF_listView = (PullToRefreshListView)findViewById(R.id.PTF_listview);
         ListView listView = PTF_listView.getRefreshableView();
         View headerView = View.inflate(getApplicationContext(), R.layout.viewpager, null);
+        //设置仅可上拉刷新
+        PTF_listView.setMode(PullToRefreshBase.Mode.PULL_FROM_END);
+        PTF_listView.getLoadingLayoutProxy().setRefreshingLabel("正在加载");
+        PTF_listView.getLoadingLayoutProxy().setPullLabel("下拉加载更多");
+        PTF_listView.getLoadingLayoutProxy().setReleaseLabel("释放开始加载");
+        //设置上拉刷新监听
+        PTF_listView.setOnRefreshListener(PullUpRefresh);
         //bug from pulltorefreshlistview. solve:http://blog.csdn.net/pk0071/article/details/50464247
         //add header view
         listView.addHeaderView(headerView);
         //初始化类
+        listData = new ArrayList<>();
         tool = new NetTools();
         //获取初始数据
         try {
+            currentPage = 0;
+            currentType = "allList";
             dialog = ProgressDialog
                     .show(Index.this, "亲别急", "活动正在加载中", false);
-            UpdateDataAndUI(0, 5, "allList");
+            UpdateDataAndUI(currentPage, 5, currentType);
             first_start = true;
         } catch (Exception e) {
             Log.e("On Create", e.toString());
@@ -83,6 +95,16 @@ public class Index extends AppCompatActivity
     private NetTools tool;
     private boolean first_start;
     private List<ActItem> listData;
+    private int currentPage;
+    private String currentType;
+    private Myadpter myadpter;
+
+    private PullToRefreshBase.OnRefreshListener PullUpRefresh = new PullToRefreshBase.OnRefreshListener() {
+        @Override
+        public void onRefresh(PullToRefreshBase refreshView) {
+            new AsyncLoadData().execute();
+        }
+    };
 
     //设置正在加载,progress
     private ProgressDialog dialog;
@@ -120,10 +142,10 @@ public class Index extends AppCompatActivity
             @Override
             public void run() {
                 try {
-                    listData = tool.getList(startPage, pageSize, dataType);
+                    List<ActItem> actItems = tool.getList(startPage, pageSize, dataType);
                     Message message = new Message();
                     message.what = UPDATE_CONTENT;
-                    message.obj = listData;
+                    message.obj = actItems;
                     handler.sendMessage(message);
                 } catch(Exception e) {
                     Log.i("onCreate", e.toString());
@@ -148,14 +170,18 @@ public class Index extends AppCompatActivity
     };
     private void updateUI(final List<ActItem> data) {
         try {
+            listData = data;
             PullToRefreshListView listView = (PullToRefreshListView) findViewById(R.id.PTF_listview);
-            Myadpter myadpter = new Myadpter(getApplicationContext(), data);
-            listView.setAdapter(myadpter);
             if (first_start == true) {
+                myadpter = new Myadpter(getApplicationContext(), listData);
                 setUpViewPager();
                 first_start = false;
+                //若每次更新UI都是setAdapter就会不停地弹回顶部
+                listView.setAdapter(myadpter);
+                dialog.dismiss();
+            } else {
+                myadpter.notifyDataSetChanged();
             }
-            dialog.dismiss();
         } catch (Exception e) {
             Log.e("updateUI", e.toString());
         }
@@ -216,5 +242,29 @@ public class Index extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    private class AsyncLoadData extends AsyncTask<Void, Void, List<ActItem>> {
+        @Override
+        protected List<ActItem> doInBackground(Void... params) {
+            List<ActItem> list = null;
+            try {
+                currentPage += 1;
+                list = tool.getList(currentPage, 5, currentType);
+            } catch (Exception e) {
+                Log.e("AsyncLoadData", e.toString());
+            }
+            return list;
+        }
+
+        @Override
+        protected void onPostExecute(List<ActItem> result) {
+            //异步加载完成后
+            Toast.makeText(getApplicationContext(), "加载完成O(∩_∩)O",Toast.LENGTH_LONG).show();
+            listData.addAll(result);
+            myadpter.notifyDataSetChanged();
+            PullToRefreshListView PTF_listView = (PullToRefreshListView)findViewById(R.id.PTF_listview);
+            PTF_listView.onRefreshComplete();
+            super.onPostExecute(result);
+        }
     }
 }

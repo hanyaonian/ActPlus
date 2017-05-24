@@ -21,7 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageView
-                android:layout_width="wrap_content"
+                android:paddingTop="@dimen/dp8"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/act_poster"/>
@@ -30,6 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/act_poster"
+                android:layout_centerHorizontal="true"
                 android:textColor="@color/text"
                 android:id="@+id/act_name"/>
             <TextView
@@ -37,6 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/act_name"
+                android:layout_centerHorizontal="true"
                 android:textColor="@color/text"
                 android:id="@+id/act_place"/>
             <TextView
@@ -44,6 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/act_place"
+                android:layout_centerHorizontal="true"
                 android:textColor="@color/text"
                 android:id="@+id/act_time"/>
         </RelativeLayout>

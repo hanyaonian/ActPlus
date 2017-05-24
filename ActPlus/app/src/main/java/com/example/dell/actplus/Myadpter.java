@@ -36,11 +36,9 @@ public class Myadpter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        try {
-            if (convertView == null) {
+            //if (convertView == null) {
                 //convertView = inflater.inflate(R.layout.cartitem_layout, null);
                 //convertView = LayoutInflater.from(appContext).inflate(R.layout.cartitem_layout, parent, false);
-
                 LayoutInflater inflater = LayoutInflater.from(appContext);
                 convertView= (LinearLayout) inflater.inflate(R.layout.cartitem_layout, null);
 
@@ -48,20 +46,22 @@ public class Myadpter extends BaseAdapter {
                 TextView time_text = (TextView) convertView.findViewById(R.id.act_time);
                 TextView place_text = (TextView) convertView.findViewById(R.id.act_place);
                 ImageView poster = (ImageView) convertView.findViewById(R.id.act_poster);
-                //set item
-                ActItem actItem = listData.get(position);
-                time_text.setText(actItem.getTime());
-                title_text.setText(actItem.getTitle());
-                place_text.setText(actItem.getActPlace());
-                //probably null
-                if (actItem.getImage() != null) {
-                    poster.setImageBitmap(actItem.getImage());
+                try {
+                    //set item
+                    ActItem actItem = listData.get(position);
+                    time_text.setText(actItem.getTime());
+                    title_text.setText(actItem.getTitle());
+                    place_text.setText(actItem.getActPlace());
+                    //probably null
+                    if (actItem.getImage() != null) {
+                        poster.setImageBitmap(actItem.getImage());
+                    } else {
+                        poster.setImageResource(R.drawable.person);
+                    }
+                } catch (Exception e) {
+                    Log.e("Myadpter getView", "getView: "+e.toString() );
                 }
-                return convertView;
-            }
-        } catch (Exception e) {
-            Log.i("adapter getView", "error");
-        }
+        //}
         return convertView;
     }
 

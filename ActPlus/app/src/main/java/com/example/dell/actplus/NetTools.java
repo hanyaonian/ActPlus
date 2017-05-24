@@ -26,7 +26,7 @@ import static android.content.ContentValues.TAG;
 public class NetTools {
     public String getListJson(int startPage, int pageSize, String pageType) {
         HttpURLConnection connection = null;
-        String url = "http://actplus.sysuactivity.com/api/actlist"+"?startPage="+startPage+"&pageSize="+pageSize+"&pageType="+pageType;
+        String url = "http://actplus.sysuactivity.com/api/actlist"+"?start="+startPage+"&pageSize="+pageSize+"&pageType="+pageType;
         try {
             Log.i("getListJson", "start connecting");
             connection = (HttpURLConnection) ((new URL(url.toString())).openConnection());

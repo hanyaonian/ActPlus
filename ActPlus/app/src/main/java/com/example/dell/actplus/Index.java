@@ -22,7 +22,10 @@ import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.ashokvarma.bottomnavigation.BottomNavigationBar;
+import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
@@ -35,6 +38,7 @@ public class Index extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_index);
+        //toolbar 设置空
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -55,6 +59,8 @@ public class Index extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        //set up bottom navigation
+        setUpBottomNavigate();
         //headerview(viewpager ,推荐最新活动)
         PullToRefreshListView PTF_listView = (PullToRefreshListView)findViewById(R.id.PTF_listview);
         ListView listView = PTF_listView.getRefreshableView();
@@ -69,18 +75,45 @@ public class Index extends AppCompatActivity
             dialog = ProgressDialog
                     .show(Index.this, "亲别急", "活动正在加载中", false);
             UpdateDataAndUI(0, 5, "allList");
-            setUpViewPager();
+            first_start = true;
         } catch (Exception e) {
             Log.e("On Create", e.toString());
         }
     }
     private NetTools tool;
+    private boolean first_start;
     private List<ActItem> listData;
 
     //设置正在加载,progress
     private ProgressDialog dialog;
     public void setUpViewPager(){
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager.setOffscreenPageLimit(5);
+        MyPagerAdapter myPagerAdapter = new MyPagerAdapter(listData, this);
+        viewPager.setAdapter(myPagerAdapter);
+    }
+    //开源项目 https://github.com/Ashok-Varma/BottomNavigation/wiki/Usage
+    public void setUpBottomNavigate() {
+        BottomNavigationBar bottomNavigationBar = (BottomNavigationBar)findViewById(R.id.bottom_navigation_bar);
+        bottomNavigationBar
+                .addItem(new BottomNavigationItem(R.drawable.home, "主页"))
+                .addItem(new BottomNavigationItem(R.drawable.group, "组队"))
+                .addItem(new BottomNavigationItem(R.drawable.person, "我的"))
+                .initialise();
+        bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener(){
+            @Override
+            public void onTabSelected(int position) {
+                if (position == 0) Toast.makeText(getApplicationContext(), "home", Toast.LENGTH_SHORT).show();
+                if (position == 1) Toast.makeText(getApplicationContext(), "group", Toast.LENGTH_SHORT).show();
+                if (position == 2) Toast.makeText(getApplicationContext(), "person", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onTabUnselected(int position) {
+            }
+            @Override
+            public void onTabReselected(int position) {
+            }
+        });
     }
     public void UpdateDataAndUI(final int startPage, final int pageSize, final String dataType) {
         new Thread(new Runnable() {
@@ -118,6 +151,10 @@ public class Index extends AppCompatActivity
             PullToRefreshListView listView = (PullToRefreshListView) findViewById(R.id.PTF_listview);
             Myadpter myadpter = new Myadpter(getApplicationContext(), data);
             listView.setAdapter(myadpter);
+            if (first_start == true) {
+                setUpViewPager();
+                first_start = false;
+            }
             dialog.dismiss();
         } catch (Exception e) {
             Log.e("updateUI", e.toString());
@@ -133,7 +170,8 @@ public class Index extends AppCompatActivity
         }
     }
 
-    @Override
+    //右上角的菜单选项，暂时不要了
+/*    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.index, menu);
@@ -153,7 +191,7 @@ public class Index extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override

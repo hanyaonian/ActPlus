@@ -14,4 +14,9 @@
         android:background="#00000000"
         android:id="@+id/PTF_listview">
     </com.handmark.pulltorefresh.library.PullToRefreshListView>
+    <com.ashokvarma.bottomnavigation.BottomNavigationBar
+        android:layout_alignParentBottom="true"
+        android:id="@+id/bottom_navigation_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </RelativeLayout>

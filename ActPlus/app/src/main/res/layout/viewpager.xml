@@ -2,11 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:id="@+id/viewPager_layout">
-    <android.support.v4.view.ViewPager
+    <com.youth.banner.Banner
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/banner"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:clipChildren="false"
-        android:id="@+id/viewPager">
-    </android.support.v4.view.ViewPager>
+        android:layout_height="180dp" />
 </LinearLayout>

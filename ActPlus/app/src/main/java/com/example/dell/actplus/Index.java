@@ -21,6 +21,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -29,6 +31,9 @@ import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.youth.banner.Banner;
+import com.youth.banner.BannerConfig;
+import com.youth.banner.Transformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +71,7 @@ public class Index extends AppCompatActivity
         //headerview(viewpager ,推荐最新活动)
         PullToRefreshListView PTF_listView = (PullToRefreshListView)findViewById(R.id.PTF_listview);
         ListView listView = PTF_listView.getRefreshableView();
+        listView.setOnItemClickListener(item_click);
         View headerView = View.inflate(getApplicationContext(), R.layout.viewpager, null);
         //设置仅可上拉刷新
         PTF_listView.setMode(PullToRefreshBase.Mode.PULL_FROM_END);
@@ -78,6 +84,7 @@ public class Index extends AppCompatActivity
         //add header view
         listView.addHeaderView(headerView);
         //初始化类
+
         listData = new ArrayList<>();
         tool = new NetTools();
         //获取初始数据
@@ -99,6 +106,8 @@ public class Index extends AppCompatActivity
     private String currentType;
     private Myadpter myadpter;
 
+    //set banner
+
     private PullToRefreshBase.OnRefreshListener PullUpRefresh = new PullToRefreshBase.OnRefreshListener() {
         @Override
         public void onRefresh(PullToRefreshBase refreshView) {
@@ -108,11 +117,36 @@ public class Index extends AppCompatActivity
 
     //设置正在加载,progress
     private ProgressDialog dialog;
-    public void setUpViewPager(){
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        viewPager.setOffscreenPageLimit(5);
-        MyPagerAdapter myPagerAdapter = new MyPagerAdapter(listData, this);
-        viewPager.setAdapter(myPagerAdapter);
+    public void setUpBanner(){
+        Banner banner = (Banner) findViewById(R.id.banner);
+        //设置banner样式
+        banner.setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE);
+        //设置图片加载器
+        banner.setImageLoader(new MyImageLoader());
+        //设置图片集合
+        List<String> images = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            String temp = "http://actplus.sysuactivity.com/imgBase/poster/"+ listData.get(i).getActPosterName();
+            images.add(temp);
+        }
+        banner.setImages(images);
+        //设置banner动画效果
+        banner.setBannerAnimation(Transformer.DepthPage);
+        //设置标题集合（当banner样式有显示title时）
+        List<String> titles = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            String temp = "最新活动："+listData.get(i).getTitle();
+            titles.add(temp);
+        }
+        banner.setBannerTitles(titles);
+        //设置自动轮播，默认为true
+        banner.isAutoPlay(true);
+        //设置轮播时间
+        banner.setDelayTime(1500);
+        //设置指示器位置（当banner模式中有指示器时）
+        banner.setIndicatorGravity(BannerConfig.CENTER);
+        //banner设置方法全部调用完毕时最后调用
+        banner.start();
     }
     //开源项目 https://github.com/Ashok-Varma/BottomNavigation/wiki/Usage
     public void setUpBottomNavigate() {
@@ -174,7 +208,7 @@ public class Index extends AppCompatActivity
             PullToRefreshListView listView = (PullToRefreshListView) findViewById(R.id.PTF_listview);
             if (first_start == true) {
                 myadpter = new Myadpter(getApplicationContext(), listData);
-                setUpViewPager();
+                setUpBanner();
                 first_start = false;
                 //若每次更新UI都是setAdapter就会不停地弹回顶部
                 listView.setAdapter(myadpter);
@@ -243,6 +277,13 @@ public class Index extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+    private AdapterView.OnItemClickListener item_click = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            ActItem selected_item = listData.get(position);
+            Toast.makeText(getApplicationContext(), selected_item.getTitle(), Toast.LENGTH_LONG).show();
+        }
+    };
     private class AsyncLoadData extends AsyncTask<Void, Void, List<ActItem>> {
         @Override
         protected List<ActItem> doInBackground(Void... params) {

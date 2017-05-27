@@ -64,7 +64,7 @@ public class NetTools {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject temp = jsonArray.getJSONObject(i);
                 //get detail
-                ActItem item = new ActItem(temp.getString("actName"), temp.getString("actTime"), temp.getInt("actId"),temp.getString("actLoc"));
+                ActItem item = new ActItem(temp.getString("actName"), temp.getString("actTime"), temp.getInt("actId"),temp.getString("actLoc"), temp.getString("posterName"));
                 //get poster image
                 item.SetImage(getImage("poster", temp.getString("posterName")));
                 data.add(item);

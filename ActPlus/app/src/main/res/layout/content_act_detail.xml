@@ -7,5 +7,4 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.dell.actplus.Act_detail"
     tools:showIn="@layout/activity_act_detail">
-
 </android.support.constraint.ConstraintLayout>

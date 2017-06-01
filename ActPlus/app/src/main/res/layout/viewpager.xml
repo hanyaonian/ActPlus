@@ -9,4 +9,13 @@
         android:id="@+id/banner"
         android:layout_width="match_parent"
         android:layout_height="180dp" />
+    <include layout="@layout/option_list"/>
+    <TextView
+        android:layout_marginLeft="@dimen/dp16"
+        android:layout_marginTop="@dimen/dp8"
+        android:layout_width="wrap_content"
+        android:id="@+id/current_page_text"
+        android:layout_height="wrap_content"
+        android:textColor="@color/anchen"
+        android:text="当前位置: 全部活动"/>
 </LinearLayout>

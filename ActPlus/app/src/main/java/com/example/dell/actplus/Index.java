@@ -10,6 +10,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.ListViewAutoScrollHelper;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -36,7 +38,9 @@ import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Index extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -48,15 +52,6 @@ public class Index extends AppCompatActivity
         //toolbar 设置空
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -117,7 +112,28 @@ public class Index extends AppCompatActivity
 
     //设置正在加载,progress
     private ProgressDialog dialog;
-    public void setUpBanner(){
+    //Set up recyclerView
+    private void setUpRecyclerView() {
+        List<Map<String, Object>> stringObjectList = new ArrayList<>();
+        //res in local
+        int optionImg[] = {R.drawable.all,R.drawable.love,R.drawable.sport,R.drawable.competition,
+                R.drawable.play,R.drawable.outdoor,R.drawable.funny,R.drawable.teach };
+        String optionNames[] = {"全部", "公益", "运动", "竞赛", "演出", "户外", "休闲", "讲座"};
+        for (int i = 0; i < 8; i++) {
+            Map<String, Object> temp = new HashMap<String, Object>();
+            temp.put("optionName", optionNames[i]);
+            temp.put("optionImg", optionImg[i]);
+            stringObjectList.add(temp);
+        }
+        //set up
+        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.option_list);
+        OptionAdapter optionAdapter = new OptionAdapter(stringObjectList);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(optionAdapter);
+    }
+    private void setUpBanner(){
         Banner banner = (Banner) findViewById(R.id.banner);
         //设置banner样式
         banner.setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE);
@@ -159,9 +175,15 @@ public class Index extends AppCompatActivity
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener(){
             @Override
             public void onTabSelected(int position) {
-                if (position == 0) Toast.makeText(getApplicationContext(), "home", Toast.LENGTH_SHORT).show();
-                if (position == 1) Toast.makeText(getApplicationContext(), "group", Toast.LENGTH_SHORT).show();
-                if (position == 2) Toast.makeText(getApplicationContext(), "person", Toast.LENGTH_SHORT).show();
+                if (position == 0) {
+                    Toast.makeText(getApplicationContext(), "home", Toast.LENGTH_SHORT).show();
+                }
+                if (position == 1) {
+                    Toast.makeText(getApplicationContext(), "group", Toast.LENGTH_SHORT).show();
+                }
+                if (position == 2) {
+                    Toast.makeText(getApplicationContext(), "person", Toast.LENGTH_SHORT).show();
+                }
             }
             @Override
             public void onTabUnselected(int position) {
@@ -208,7 +230,9 @@ public class Index extends AppCompatActivity
             PullToRefreshListView listView = (PullToRefreshListView) findViewById(R.id.PTF_listview);
             if (first_start == true) {
                 myadpter = new Myadpter(getApplicationContext(), listData);
+                //内容加载完毕，开始显示内容
                 setUpBanner();
+                setUpRecyclerView();
                 first_start = false;
                 //若每次更新UI都是setAdapter就会不停地弹回顶部
                 listView.setAdapter(myadpter);

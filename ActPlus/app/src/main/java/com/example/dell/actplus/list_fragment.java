@@ -1,13 +1,14 @@
-package layout;
+package com.example.dell.actplus;
 
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
-import android.icu.text.UnicodeSetSpanner;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,13 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.dell.actplus.ActItem;
-import com.example.dell.actplus.Index;
-import com.example.dell.actplus.MyImageLoader;
-import com.example.dell.actplus.Myadpter;
-import com.example.dell.actplus.NetTools;
-import com.example.dell.actplus.OptionAdapter;
-import com.example.dell.actplus.R;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.youth.banner.Banner;
@@ -36,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class list extends Fragment {
+public class list_fragment extends Fragment {
 
     private NetTools tool;
     private boolean first_start;
@@ -70,7 +64,13 @@ public class list extends Fragment {
         PTF_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(), "shit", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), listData.get(position-2).getTitle(), Toast.LENGTH_LONG).show();
+                FragmentManager fragmentManager = getActivity().getFragmentManager();
+                actdetail act_detail = new actdetail();
+                FragmentTransaction ft = fragmentManager.beginTransaction();
+                ft.replace(R.id.main_fragment, act_detail );
+                ft.addToBackStack(null);
+                ft.commit();
             }
         });
         //bug from pulltorefreshlistview. solve:http://blog.csdn.net/pk0071/article/details/50464247
@@ -197,7 +197,7 @@ public class list extends Fragment {
     private PullToRefreshBase.OnRefreshListener PullUpRefresh = new PullToRefreshBase.OnRefreshListener() {
         @Override
         public void onRefresh(PullToRefreshBase refreshView) {
-            new list.AsyncLoadData().execute();
+            new list_fragment.AsyncLoadData().execute();
         }
     };
     private class AsyncLoadData extends AsyncTask<Void, Void, List<ActItem>> {

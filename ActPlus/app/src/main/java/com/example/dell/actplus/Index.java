@@ -1,46 +1,20 @@
 package com.example.dell.actplus;
 
-import android.app.ProgressDialog;
-import android.net.wifi.p2p.WifiP2pManager;
-import android.os.AsyncTask;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.ListViewAutoScrollHelper;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
-import com.youth.banner.Banner;
-import com.youth.banner.BannerConfig;
-import com.youth.banner.Transformer;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Index extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -63,6 +37,13 @@ public class Index extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         //set up bottom navigation
         setUpBottomNavigate();
+        //set up default fragment
+        setUpDefaultFragment();
+    }
+    public void setUpDefaultFragment() {
+        FragmentManager fragmentManager = this.getFragmentManager();
+        list_fragment list_fragment = new list_fragment();
+        fragmentManager.beginTransaction().replace(R.id.main_fragment, list_fragment).commit();
     }
     //开源项目 https://github.com/Ashok-Varma/BottomNavigation/wiki/Usage
     public void setUpBottomNavigate() {

@@ -20,12 +20,11 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <fragment
+    <FrameLayout
         android:layout_marginTop="55dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="layout.list"
-        android:id="@+id/fragment_list"
+        android:id="@+id/main_fragment"
         />
     <com.ashokvarma.bottomnavigation.BottomNavigationBar
         android:layout_gravity="bottom"

@@ -65,8 +65,8 @@ public class NetTools {
                 JSONObject temp = jsonArray.getJSONObject(i);
                 //get detail
                 ActItem item = new ActItem(temp.getString("actName"), temp.getString("actTime"), temp.getInt("actId"),temp.getString("actLoc"), temp.getString("posterName"));
-                //get poster image
-                item.SetImage(getImage("poster", temp.getString("posterName")));
+                //get poster image,这里是旧的方法，加载图片到bitmap里头，但是太慢了，改用glide。
+                //item.SetImage(getImage("poster", temp.getString("posterName")));
                 data.add(item);
             }
         } catch (Exception e) {
@@ -74,6 +74,7 @@ public class NetTools {
         }
         return data;
     }
+    //此方法太慢，改用glide
     public Bitmap getImage(String imageType, String imageName) {
         //获取方式 ： GET
         //图片地址 ：http://actplus.sysuactivity.com/imgBase/{imageType}/{imageName}

@@ -12,8 +12,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RunnableFuture;
 
@@ -100,5 +104,118 @@ public class NetTools {
             connection.disconnect();
         }
         return null;
+    }
+    public Map<String, Object> getActOriginDetail(int actId) {
+        String url = "http://actplus.sysuactivity.com/api/actmeta/?actId="+actId;
+        HttpURLConnection connection = null;
+        String response = "";
+        Map<String, Object> item = new HashMap<>();
+        try {
+            connection = (HttpURLConnection) (new URL(url.toString())).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(3000);
+            connection.setReadTimeout(3000);
+            if (connection.getResponseCode() == 200) {
+                InputStream in = connection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    response += line;
+                }
+            }
+        } catch (Exception e) {
+            Log.e("getActOriginDetail:", e.toString());
+        }
+        try {
+            JSONObject detail_data = new JSONObject(response);
+            //get detail
+            item.put("actName", detail_data.getString("actName"));
+            item.put("actTime", detail_data.getString("actTime"));
+            item.put("actLoc", detail_data.getString("actLoc"));
+            item.put("actPub", detail_data.getString("actPub"));
+            item.put("posterName", detail_data.getString("posterName"));
+        } catch (Exception e) {
+            Log.i("jsonArray part", "error");
+        }
+        return item;
+    }
+    public Map<String, Object> getActDetail(int actId) {
+        String url = "http://actplus.sysuactivity.com/api/actdetail/?actId=" + actId;
+        HttpURLConnection connection = null;
+        String response = "";
+        Map<String, Object> item = new HashMap<>();
+        try {
+            connection = (HttpURLConnection) (new URL(url.toString())).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(3000);
+            connection.setReadTimeout(3000);
+            if (connection.getResponseCode() == 200) {
+                InputStream in = connection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    response += line;
+                }
+            }
+        } catch (Exception e) {
+            Log.e("getActOriginDetail:", e.toString());
+        }
+        try {
+            JSONObject detail_data = new JSONObject(response);
+            //get detail
+            item.put("qrName", detail_data.getString("qrName"));
+            item.put("actFor", detail_data.getString("actFor"));
+            item.put("actDetail", detail_data.getString("actDetail"));
+            item.put("actJoin", detail_data.getString("actJoin"));
+        } catch (Exception e) {
+            Log.i("jsonArray part", "error");
+        }
+        return item;
+    }
+    public List<Map<String, String>> getGroupList(final int startPage,final int pageSize) {
+        List<Map<String, String>> data = new ArrayList<>();
+        String url = "http://actplus.sysuactivity.com/api/group/groupList?start="+startPage+"&pageSize="+pageSize;
+        HttpURLConnection connection = null;
+        String response = "";
+        //get response
+        try {
+            connection = (HttpURLConnection) (new URL(url.toString())).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setReadTimeout(3000);
+            connection.setConnectTimeout(3000);
+            if (connection.getResponseCode() == 200) {
+                InputStream in = connection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    response += line;
+                }
+            }
+        }catch (Exception e) {
+            Log.e("getGroupList:", e.toString());
+        }
+        //解析response
+        try {
+            JSONArray jsonArray = new JSONArray(response);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject temp = jsonArray.getJSONObject(i);
+                //get detail
+                Map<String, String> item = new HashMap<>();
+                item.put("groupId", temp.getString("groupId"));
+                item.put("contact", temp.getString("contact"));
+                item.put("title", temp.getString("title"));
+                //解析时间
+                //SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
+                //Date date = format.parse(temp.getString("pubTime"));
+                //item.put("pubTime", date.toString());
+                item.put("pubTime", temp.getString("pubTime"));
+                item.put("mainText", temp.getString("mainText"));
+                item.put("actType", temp.getString("actType"));
+                data.add(item);
+            }
+        } catch (Exception e) {
+            Log.i("get group List json:", "error");
+        }
+        return data;
     }
 }

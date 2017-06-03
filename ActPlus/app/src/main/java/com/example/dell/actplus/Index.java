@@ -19,6 +19,8 @@ import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 public class Index extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private ActItem selected_item;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,10 +59,14 @@ public class Index extends AppCompatActivity
             @Override
             public void onTabSelected(int position) {
                 if (position == 0) {
-                    Toast.makeText(getApplicationContext(), "home", Toast.LENGTH_SHORT).show();
+                    FragmentManager fragmentManager = getFragmentManager();
+                    list_fragment list_fragment = new list_fragment();
+                    fragmentManager.beginTransaction().replace(R.id.main_fragment, list_fragment).commit();
                 }
                 if (position == 1) {
-                    Toast.makeText(getApplicationContext(), "group", Toast.LENGTH_SHORT).show();
+                    FragmentManager fragmentManager = getFragmentManager();
+                    grouplist group_list_fragment = new grouplist();
+                    fragmentManager.beginTransaction().replace(R.id.main_fragment, group_list_fragment).commit();
                 }
                 if (position == 2) {
                     Toast.makeText(getApplicationContext(), "person", Toast.LENGTH_SHORT).show();
@@ -108,5 +114,11 @@ public class Index extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    public void setSelected_item(ActItem actitem){
+        this.selected_item = actitem;
+    }
+    public ActItem getSelected_item() {
+        return this.selected_item;
     }
 }

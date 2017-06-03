@@ -64,7 +64,9 @@ public class list_fragment extends Fragment {
         PTF_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity().getApplicationContext(), listData.get(position-2).getTitle(), Toast.LENGTH_LONG).show();
+                //通过此方法将参数传到activity，实在没啥办法啦~
+                ((Index)getActivity()).setSelected_item(listData.get(position-2));
+                //替换fragment
                 FragmentManager fragmentManager = getActivity().getFragmentManager();
                 actdetail act_detail = new actdetail();
                 FragmentTransaction ft = fragmentManager.beginTransaction();

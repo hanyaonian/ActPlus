@@ -1,10 +1,12 @@
 package com.example.dell.actplus;
 
 import android.content.Context;
+import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +24,7 @@ import java.util.Map;
 
 public class grouplist_adapter extends BaseAdapter {
     private List<Map<String, String>> listData;
+    private List<UserInfo> userInfoList;
     //app context
     private static LayoutInflater inflater=null;
     private Context appContext;
@@ -34,7 +38,6 @@ public class grouplist_adapter extends BaseAdapter {
         //set inflater, why? see next
         inflater = LayoutInflater.from(context);
     }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(appContext);
@@ -46,14 +49,17 @@ public class grouplist_adapter extends BaseAdapter {
         group_detail = (TextView)convertView.findViewById(R.id.group_detail);
         group_contact = (TextView)convertView.findViewById(R.id.group_contact);
         act_type = (TextView)convertView.findViewById(R.id.act_type);
+        ImageView Head_img = (ImageView)convertView.findViewById(R.id.group_pub_img);
         try {
             Map<String, String> temp = listData.get(position);
+            //get userid
             group_contact.setText("联系方式："+temp.get("contact"));
             group_time.setText(temp.get("pubTime"));
             group_title.setText(temp.get("title"));
             act_type.setText(temp.get("actType"));
             group_detail.setText(temp.get("mainText"));
-            group_pub.setText(temp.get("groupId")+"发布于:");
+            group_pub.setText(temp.get("sponsorId")+"发布于:");
+            //Glide.with(appContext).load("http://actplus.sysuactivity.com/imgBase/headImg/"+temp.get("head_img")).into(Head_img);
         } catch (Exception e) {
             Log.e("group_list error:", e.toString());
         }
@@ -69,4 +75,5 @@ public class grouplist_adapter extends BaseAdapter {
     public Object getItem(int position) {
         return listData.get(position);
     }
+
 }

@@ -16,7 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
@@ -24,23 +26,29 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
+import com.youth.banner.listener.OnBannerListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class list_fragment extends Fragment {
 
     private NetTools tool;
     private boolean first_start;
+    private boolean true_first_start;
     private List<ActItem> listData;
+    private List<ActItem> banner_list;
+    private List<Map<String, Object>> stringObjectList;
     private int currentPage;
     private String currentType;
     private Myadpter myadpter;
     private final int UPDATE_CONTENT = 0;
     //设置正在加载,progress
     private ProgressDialog dialog;
+    private UserInfo userInfo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,7 +79,7 @@ public class list_fragment extends Fragment {
                 actdetail act_detail = new actdetail();
                 FragmentTransaction ft = fragmentManager.beginTransaction();
                 ft.replace(R.id.main_fragment, act_detail );
-                ft.addToBackStack(null);
+                //ft.addToBackStack(null);
                 ft.commit();
             }
         });
@@ -89,7 +97,7 @@ public class list_fragment extends Fragment {
             dialog = ProgressDialog
                     .show(getActivity(), "亲别急", "活动正在加载中", false);
             UpdateDataAndUI(currentPage, 5, currentType);
-            first_start = true;
+            true_first_start = first_start = true;
         } catch (Exception e) {
             Log.e("On Create", e.toString());
         }
@@ -119,6 +127,11 @@ public class list_fragment extends Fragment {
                 case UPDATE_CONTENT:
                     List<ActItem> data = (List<ActItem>) msg.obj;
                     updateUI(data);
+                    if (true_first_start == true) {
+                        setUpBanner();
+                        setUpRecyclerView();
+                        true_first_start = false;
+                    }
                     break;
                 default:
                     break;
@@ -127,13 +140,13 @@ public class list_fragment extends Fragment {
     };
     private void updateUI(final List<ActItem> data) {
         try {
+            if (data.size() == 0) {
+                Toast.makeText(getActivity().getApplicationContext(), "啊噢, 该分类最近好像没活动哦~", Toast.LENGTH_LONG).show();
+            }
             listData = data;
             PullToRefreshListView listView = (PullToRefreshListView) getView().findViewById(R.id.PTF_listview);
             if (first_start == true) {
                 myadpter = new Myadpter(getActivity().getApplicationContext(), listData);
-                //内容加载完毕，开始显示内容
-                setUpBanner();
-                setUpRecyclerView();
                 first_start = false;
                 //若每次更新UI都是setAdapter就会不停地弹回顶部
                 listView.setAdapter(myadpter);
@@ -146,26 +159,41 @@ public class list_fragment extends Fragment {
         }
     }
     private void setUpRecyclerView() {
-        List<Map<String, Object>> stringObjectList = new ArrayList<>();
+       stringObjectList = new ArrayList<>();
         //res in local
         int optionImg[] = {R.drawable.all,R.drawable.love,R.drawable.sport,R.drawable.competition,
                 R.drawable.play,R.drawable.outdoor,R.drawable.funny,R.drawable.teach };
         String optionNames[] = {"全部", "公益", "运动", "竞赛", "演出", "户外", "休闲", "讲座"};
+        String optionTypes[] = {"allList", "welfare", "PE", "game", "performance", "outside", "casual", "lecture"};
         for (int i = 0; i < 8; i++) {
             Map<String, Object> temp = new HashMap<String, Object>();
             temp.put("optionName", optionNames[i]);
             temp.put("optionImg", optionImg[i]);
+            temp.put("optionType", optionTypes[i]);
             stringObjectList.add(temp);
         }
         //set up
         RecyclerView recyclerView = (RecyclerView)getView().findViewById(R.id.option_list);
         OptionAdapter optionAdapter = new OptionAdapter(stringObjectList);
+        optionAdapter.setOnItemClickListener(new OptionAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                currentType = (String) stringObjectList.get(position).get("optionType");
+                currentPage = 0;
+                listData.clear();
+                first_start = true;
+                TextView current_pos = (TextView)getView().findViewById(R.id.current_page_text);
+                current_pos.setText("当前位置："+(String) stringObjectList.get(position).get("optionName")+"活动");
+                UpdateDataAndUI(currentPage, 5, currentType);
+            }
+        });
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(optionAdapter);
     }
     private void setUpBanner(){
+        banner_list = listData;
         Banner banner = (Banner) getView().findViewById(R.id.banner);
         //设置banner样式
         banner.setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE);
@@ -174,7 +202,7 @@ public class list_fragment extends Fragment {
         //设置图片集合
         List<String> images = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            String temp = "http://actplus.sysuactivity.com/imgBase/poster/"+ listData.get(i).getActPosterName();
+            String temp = "http://actplus.sysuactivity.com/imgBase/poster/"+ banner_list.get(i).getActPosterName();
             images.add(temp);
         }
         banner.setImages(images);
@@ -183,7 +211,7 @@ public class list_fragment extends Fragment {
         //设置标题集合（当banner样式有显示title时）
         List<String> titles = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            String temp = "最新活动："+listData.get(i).getTitle();
+            String temp = "最新活动："+banner_list.get(i).getTitle();
             titles.add(temp);
         }
         banner.setBannerTitles(titles);
@@ -193,6 +221,19 @@ public class list_fragment extends Fragment {
         banner.setDelayTime(1500);
         //设置指示器位置（当banner模式中有指示器时）
         banner.setIndicatorGravity(BannerConfig.CENTER);
+        banner.setOnBannerListener(new OnBannerListener() {
+            @Override
+            public void OnBannerClick(int position) {
+                ((Index)getActivity()).setSelected_item(banner_list.get(position));
+                //替换fragment
+                FragmentManager fragmentManager = getActivity().getFragmentManager();
+                actdetail act_detail = new actdetail();
+                FragmentTransaction ft = fragmentManager.beginTransaction();
+                ft.replace(R.id.main_fragment, act_detail );
+                //ft.addToBackStack(null);
+                ft.commit();
+            }
+        });
         //banner设置方法全部调用完毕时最后调用
         banner.start();
     }
@@ -217,7 +258,11 @@ public class list_fragment extends Fragment {
         @Override
         protected void onPostExecute(List<ActItem> result) {
             //异步加载完成后
-            Toast.makeText(getActivity().getApplicationContext(), "加载完成O(∩_∩)O",Toast.LENGTH_LONG).show();
+            if(result.size() == 0) {
+                Toast.makeText(getActivity().getApplicationContext(), "啊噢, 好像就那么多了哦~", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity().getApplicationContext(), "加载完成~", Toast.LENGTH_LONG).show();
+            }
             listData.addAll(result);
             myadpter.notifyDataSetChanged();
             PullToRefreshListView PTF_listView = (PullToRefreshListView)getView().findViewById(R.id.PTF_listview);

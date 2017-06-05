@@ -31,8 +31,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_alignParentLeft="true"
-                    android:layout_margin="@dimen/dp16"
-                    android:src="@drawable/group" />
+                    android:layout_margin="@dimen/dp16" />
 
                 <TextView
                     android:id="@+id/group_title"

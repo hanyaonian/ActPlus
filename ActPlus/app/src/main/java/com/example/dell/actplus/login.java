@@ -1,6 +1,8 @@
 package com.example.dell.actplus;
 
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -24,6 +26,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -44,7 +47,27 @@ public class login extends Fragment {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         Button sign_in_butt = (Button)view.findViewById(R.id.sign_in_butt);
         sign_in_butt.setOnClickListener(signin_click);
+        Button sign_up_butt = (Button)view.findViewById(R.id.go_sign_up_butt);
+        sign_up_butt.setOnClickListener(signup_butt_click);
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Map<String, String> userInfo = ((Loginpage)getActivity()).getCurrentUserInfo();
+        Button sign_in_butt = (Button)getView().findViewById(R.id.sign_in_butt);
+        if (userInfo.get("username").equals("") == false) {
+            try {
+                EditText password_text = (EditText)getView().findViewById(R.id.input_password);
+                EditText username_text = (EditText)getView().findViewById(R.id.input_username);
+                password_text.setText(userInfo.get("password"));
+                username_text.setText(userInfo.get("username"));
+                sign_in_butt.performClick();
+            } catch (Exception e) {
+                Log.e("onCreateView: ", e.toString());
+            }
+        }
     }
     private View.OnClickListener signin_click = new View.OnClickListener() {
         @Override
@@ -53,15 +76,19 @@ public class login extends Fragment {
             EditText username_text = (EditText)getView().findViewById(R.id.input_username);
             final String password = password_text.getText().toString();
             final String username = username_text.getText().toString();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    signin(password, username);
-                }
-            }).start();
+            if (password.equals("") || username.equals("")) {
+                Toast.makeText(getActivity().getApplicationContext(), "用户名或密码不能为空", Toast.LENGTH_LONG).show();
+            } else {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        signin(password, username);
+                    }
+                }).start();
+            }
         }
     };
-    private void signin(String password, String username) {
+    public void signin(String password, String username) {
         HttpURLConnection connection = null;
         String url = "http://actplus.sysuactivity.com/api/user/loginMethod";
         String response = "";
@@ -94,13 +121,15 @@ public class login extends Fragment {
         } catch (Exception e) {
             Log.e("sign in part:" , e.toString());
         }
-        is_sign_in(response, responseCookie);
+        is_sign_in(response, responseCookie, password, username);
     }
-    private void is_sign_in(String response, String reponseCookie) {
+    private void is_sign_in(String response, String reponseCookie, String password, String username) {
         try {
             JSONObject ans = new JSONObject(response);
             int code = ans.getInt("code");
             if ( code ==  202) {
+                ((Loginpage)getActivity()).setCurrentUserInfo(username, password);
+                ((Loginpage)getActivity()).saveData();
                 turnToIndex(reponseCookie);
             } else {
                 Message message = new Message();
@@ -124,7 +153,7 @@ public class login extends Fragment {
             }
         }
     };
-    private void turnToIndex(String cookie) {
+    public void turnToIndex(String cookie) {
         Intent intent = new Intent();
         intent.setClass(getActivity(), Index.class);
         intent.putExtra("cookie", cookie);
@@ -132,4 +161,15 @@ public class login extends Fragment {
         getActivity().finish();
         startActivity(intent);
     }
+    private View.OnClickListener signup_butt_click = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getFragmentManager();
+            signup f_signup = new signup();
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.addToBackStack(null);
+            ft.replace(R.id.login_fragment, f_signup);
+            ft.commit();
+        }
+    };
 }

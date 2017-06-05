@@ -47,6 +47,7 @@
             <EditText
                 android:layout_below="@id/text1"
                 android:maxLines="1"
+                android:inputType="textShortMessage"
                 android:id="@+id/input_username"
                 android:layout_margin="@dimen/dp5"
                 android:layout_centerHorizontal="true"
@@ -99,9 +100,9 @@
             android:layout_height="wrap_content"
             android:text="还没有账号?"
             android:layout_alignParentRight="true"
-            android:layout_above="@+id/sign_up_butt"/>
+            android:layout_above="@+id/go_sign_up_butt"/>
         <Button
-            android:id="@+id/sign_up_butt"
+            android:id="@+id/go_sign_up_butt"
             android:layout_width="80dp"
             android:layout_height="50dp"
             android:textAlignment="center"

@@ -88,10 +88,16 @@ public class actdetail extends Fragment {
             act_time.setText("活动时间： "+(String)data.get("actTime"));
             act_pub.setText("活动发布： "+(String)data.get("actPub"));
             act_detail.setText("活动详情： "+(String)data.get("actDetail"));
+            ImageView qr_img = (ImageView)getView().findViewById(R.id.qr_img);
             if (data.get("posterName") != null) {
                 Glide.with(getActivity().getApplicationContext())
                         .load("http://actplus.sysuactivity.com/imgBase/poster/" + data.get("posterName"))
                         .into(poster);
+            }
+            if (data.get("qrName") != null) {
+                Glide.with(getActivity().getApplicationContext())
+                        .load("http://actplus.sysuactivity.com/imgBase/qrImg/" + data.get("qrName"))
+                        .into(qr_img);
             }
         } catch (Exception e) {
             Log.e("updateUI", e.toString());

@@ -5,11 +5,13 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RunnableFuture;
+import java.util.logging.Logger;
 
 import static android.content.ContentValues.TAG;
 
@@ -30,7 +33,7 @@ import static android.content.ContentValues.TAG;
 public class NetTools {
     public String getListJson(int startPage, int pageSize, String pageType) {
         HttpURLConnection connection = null;
-        String url = "http://actplus.sysuactivity.com/api/actlist"+"?start="+startPage+"&pageSize="+pageSize+"&pageType="+pageType;
+        String url = "http://actplus.sysuactivity.com/api/actlist"+"?start="+startPage+"&pageSize="+pageSize+"&actType="+pageType;
         try {
             Log.i("getListJson", "start connecting");
             connection = (HttpURLConnection) ((new URL(url.toString())).openConnection());
@@ -204,6 +207,8 @@ public class NetTools {
                 item.put("groupId", temp.getString("groupId"));
                 item.put("contact", temp.getString("contact"));
                 item.put("title", temp.getString("title"));
+                item.put("sponsorId", temp.getString("sponsorId"));
+                //强行获取头像、用户名
                 //解析时间
                 //SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
                 //Date date = format.parse(temp.getString("pubTime"));
@@ -217,5 +222,74 @@ public class NetTools {
             Log.i("get group List json:", "error");
         }
         return data;
+    }
+    //使用cookie获得userinfo
+    public UserInfo getUserInfo(String cookie) {
+        HttpURLConnection connection = null;
+        String url = "http://actplus.sysuactivity.com/api/user/userInfo";
+        String response = "";
+        try {
+            connection = (HttpURLConnection)(new URL(url.toString())).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(3000);
+            connection.setReadTimeout(3000);
+            connection.setRequestProperty("Cookie", cookie);
+            if (connection.getResponseCode() == 200) {
+                InputStream in = connection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    response += line;
+                }
+            }
+        } catch (Exception e) {
+            Log.i(TAG, e.toString());
+        }
+        try {
+            JSONObject userJson = new JSONObject(response);
+            UserInfo userInfo = new UserInfo(userJson.getString("nickname"), userJson.getString("headImg"), userJson.getString("userId"));
+            return userInfo;
+        } catch (JSONException e) {
+            Log.e("userJson:", e.toString());
+        }
+        return null;
+    }
+    //写参获取userInfo
+    public static UserInfo getUserInfo(int userId) {
+        HttpURLConnection connection = null;
+        String url = "http://actplus.sysuactivity.com/api/user/userInfo";
+        String response = "";
+        try {
+            connection = (HttpURLConnection)(new URL(url.toString())).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(3000);
+            connection.setReadTimeout(3000);
+            String data = "userId="+userId;
+            connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Length", data.length()+"");
+            connection.setDoOutput(true);
+            connection.setDoInput(true);//允许回传
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(data.getBytes());
+            outputStream.close();
+            if (connection.getResponseCode() == 200) {
+                InputStream in = connection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    response += line;
+                }
+            }
+        } catch (Exception e) {
+            Log.i(TAG, "getUserInfo: error");
+        }
+        try {
+            JSONObject userJson = new JSONObject(response);
+            UserInfo userInfo = new UserInfo(userJson.getString("nickname"), userJson.getString("headImg"), userJson.getString("userId"));
+            return userInfo;
+        } catch (JSONException e) {
+            Log.e("userJson:", e.toString());
+        }
+        return null;
     }
 }

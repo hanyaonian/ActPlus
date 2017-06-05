@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

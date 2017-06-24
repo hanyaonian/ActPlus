@@ -1,7 +1,7 @@
 package com.example.dell.actplus;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,8 +12,10 @@ import android.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,7 +25,16 @@ import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.bumptech.glide.Glide;
 
+import net.NetTools;
+
 import java.util.List;
+
+import entity.ActItem;
+import entity.UserInfo;
+import fragment.actdetail;
+import fragment.grouplist;
+import fragment.list_fragment;
+import fragment.personcenter;
 
 public class Index extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -31,10 +42,12 @@ public class Index extends AppCompatActivity
     private ActItem selected_item;
     private String userCookie;
     private final int UPDATE_USERINFO = 1;
+    private final int UPDATE_USERGROUP = 0;
     private grouplist groupList;
     private actdetail actDetail;
     private list_fragment listFragment;
     private personcenter personCenter;
+    private List<String> groups;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +74,23 @@ public class Index extends AppCompatActivity
         //get cookie
         setCookie(getIntent().getStringExtra("cookie"));
         Update_UserInfo();
+    }
+    private void Update_UserGroups() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    NetTools tool = new NetTools();
+                    List<String> list_group = tool.getUserGroup(getUserCookie());
+                    Message message = new Message();
+                    message.what = UPDATE_USERGROUP;
+                    message.obj = list_group;
+                    handler.sendMessage(message);
+                } catch (Exception e) {
+                    Log.e("usergroup:" , e.toString());
+                }
+            }
+        }).start();
     }
     private void setUpFragment() {
         groupList = new grouplist();
@@ -90,6 +120,9 @@ public class Index extends AppCompatActivity
                     UserInfo info = (UserInfo)msg.obj;
                     update_UserInfo(info);
                     break;
+                case UPDATE_USERGROUP:
+                    groups = (List<String>)msg.obj;
+                    showGroupDialog();
                 default:
                     break;
             }
@@ -184,7 +217,7 @@ public class Index extends AppCompatActivity
         if (id == R.id.my_start) {
             Toast.makeText(getApplicationContext(), "还在做~", Toast.LENGTH_LONG).show();
         } else if (id == R.id.my_group) {
-            Toast.makeText(getApplicationContext(), "还在做~", Toast.LENGTH_LONG).show();
+            Update_UserGroups();
         } else if (id == R.id.log_out) {
             Intent intent = new Intent(Index.this, Loginpage.class);
             intent.putExtra("auto_login", false);
@@ -201,4 +234,35 @@ public class Index extends AppCompatActivity
     public ActItem getSelected_item() {
         return this.selected_item;
     }
+
+
+    public void showGroupDialog() {
+        if (groups == null) {
+            return;
+        } else if (groups.size() == 0) {
+            return;
+        }
+        String items[] = new String[groups.size()];
+        items = groups.toArray(items);
+            //dialog参数设置
+            AlertDialog.Builder builder=new AlertDialog.Builder(this);  //先得到构造器
+            builder.setTitle("我的组队"); //设置标题
+
+            builder.setIcon(R.drawable.group);//设置图标，图片id即可
+            //设置列表显示，注意设置了列表显示就不要设置builder.setMessage()了，否则列表不起作用。
+            builder.setItems(items,new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int position) {
+                    dialog.dismiss();
+                }
+            });
+            builder.setPositiveButton("确定",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    Toast.makeText(getApplicationContext(), "确定", Toast.LENGTH_SHORT).show();
+                }
+            });
+            builder.create().show();
+        }
 }

@@ -1,4 +1,4 @@
-package com.example.dell.actplus;
+package fragment;
 
 import android.os.Bundle;
 import android.app.Fragment;
@@ -9,9 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import net.NetTools;
+import com.example.dell.actplus.R;
+import adapter.grouplist_adapter;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

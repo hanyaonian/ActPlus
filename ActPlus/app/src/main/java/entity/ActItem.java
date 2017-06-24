@@ -1,4 +1,4 @@
-package com.example.dell.actplus;
+package entity;
 
 import android.graphics.Bitmap;
 

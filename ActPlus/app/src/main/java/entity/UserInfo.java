@@ -1,4 +1,4 @@
-package com.example.dell.actplus;
+package entity;
 
 /**
  * Created by DELL on 2017/6/5.

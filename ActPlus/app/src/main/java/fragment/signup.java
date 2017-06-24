@@ -1,10 +1,8 @@
-package com.example.dell.actplus;
+package fragment;
 
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.Notification;
-import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Message;
@@ -15,6 +13,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.dell.actplus.Loginpage;
+import com.example.dell.actplus.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +28,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import fragment.login;
 
 public class signup extends Fragment {
 

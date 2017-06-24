@@ -1,4 +1,4 @@
-package com.example.dell.actplus;
+package fragment;
 
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
@@ -16,11 +16,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import entity.ActItem;
+import com.example.dell.actplus.Index;
+import com.example.dell.actplus.MyImageLoader;
+import net.NetTools;
+import com.example.dell.actplus.R;
+import entity.UserInfo;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.youth.banner.Banner;
@@ -32,7 +37,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadPoolExecutor;
+
+import adapter.Myadpter;
+import adapter.OptionAdapter;
 
 public class list_fragment extends Fragment {
 
@@ -201,7 +208,7 @@ public class list_fragment extends Fragment {
         banner.setImageLoader(new MyImageLoader());
         //设置图片集合
         List<String> images = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < banner_list.size(); i++) {
             String temp = "http://actplus.sysuactivity.com/imgBase/poster/"+ banner_list.get(i).getActPosterName();
             images.add(temp);
         }
@@ -210,7 +217,7 @@ public class list_fragment extends Fragment {
         banner.setBannerAnimation(Transformer.DepthPage);
         //设置标题集合（当banner样式有显示title时）
         List<String> titles = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < banner_list.size(); i++) {
             String temp = "最新活动："+banner_list.get(i).getTitle();
             titles.add(temp);
         }

@@ -1,4 +1,4 @@
-package com.example.dell.actplus;
+package fragment;
 
 import android.os.Bundle;
 import android.app.Fragment;
@@ -12,6 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import entity.ActItem;
+import com.example.dell.actplus.Index;
+import net.NetTools;
+import com.example.dell.actplus.R;
 
 import java.util.Map;
 

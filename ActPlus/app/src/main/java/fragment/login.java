@@ -1,4 +1,4 @@
-package com.example.dell.actplus;
+package fragment;
 
 
 import android.app.FragmentManager;
@@ -14,8 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.dell.actplus.Index;
+import com.example.dell.actplus.Loginpage;
+import com.example.dell.actplus.R;
 
 import org.json.JSONObject;
 
@@ -25,7 +28,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 
 

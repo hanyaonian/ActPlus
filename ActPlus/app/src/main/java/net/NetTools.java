@@ -1,8 +1,11 @@
-package com.example.dell.actplus;
+package net;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+
+import entity.ActItem;
+import entity.UserInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,18 +14,12 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.RunnableFuture;
-import java.util.logging.Logger;
 
 import static android.content.ContentValues.TAG;
 
@@ -63,7 +60,7 @@ public class NetTools {
         }
         return null;
     }
-    public List<ActItem> getList(final int startPage,final int pageSize,final String pageType) {
+    public List<ActItem> getList(final int startPage, final int pageSize, final String pageType) {
         List<ActItem> data = new ArrayList<>();
         String shit = getListJson(startPage, pageSize, pageType);
         try {
@@ -254,24 +251,17 @@ public class NetTools {
         }
         return null;
     }
-    //写参获取userInfo
-    public static UserInfo getUserInfo(int userId) {
+    //使用cookie获得user发布的组队信息
+    public List<String> getUserGroup(String cookie) {
         HttpURLConnection connection = null;
-        String url = "http://actplus.sysuactivity.com/api/user/userInfo";
+        String url = "http://actplus.sysuactivity.com/api/user/myTeam";
         String response = "";
         try {
             connection = (HttpURLConnection)(new URL(url.toString())).openConnection();
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(3000);
             connection.setReadTimeout(3000);
-            String data = "userId="+userId;
-            connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
-            connection.setRequestProperty("Content-Length", data.length()+"");
-            connection.setDoOutput(true);
-            connection.setDoInput(true);//允许回传
-            OutputStream outputStream = connection.getOutputStream();
-            outputStream.write(data.getBytes());
-            outputStream.close();
+            connection.setRequestProperty("Cookie", cookie);
             if (connection.getResponseCode() == 200) {
                 InputStream in = connection.getInputStream();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
@@ -281,12 +271,17 @@ public class NetTools {
                 }
             }
         } catch (Exception e) {
-            Log.i(TAG, "getUserInfo: error");
+            Log.i(TAG, e.toString());
         }
         try {
-            JSONObject userJson = new JSONObject(response);
-            UserInfo userInfo = new UserInfo(userJson.getString("nickname"), userJson.getString("headImg"), userJson.getString("userId"));
-            return userInfo;
+            JSONArray groupsJson = new JSONArray(response);
+            List<String> groups = new ArrayList<>();
+            for (int i = 0; i < groupsJson.length(); i++) {
+                JSONObject temp = groupsJson.getJSONObject(i);
+                String group = temp.getString("title");
+                groups.add(group);
+            }
+            return groups;
         } catch (JSONException e) {
             Log.e("userJson:", e.toString());
         }

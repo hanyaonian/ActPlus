@@ -1,4 +1,4 @@
-package com.example.dell.actplus;
+package fragment;
 
 
 import android.content.Intent;
@@ -14,6 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.dell.actplus.Index;
+import com.example.dell.actplus.Loginpage;
+import net.NetTools;
+import com.example.dell.actplus.R;
+import entity.UserInfo;
 
 
 /**

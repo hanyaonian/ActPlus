@@ -1,8 +1,6 @@
-package com.example.dell.actplus;
+package adapter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import entity.ActItem;
+import com.example.dell.actplus.R;
 
 import java.util.List;
 
